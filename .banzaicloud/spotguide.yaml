@@ -1,0 +1,133 @@
+name: 'Zeppelin with Spark'
+description: 'TODO write a description'
+tags: ['Zeppelin', 'Spark']
+resources:
+  sumCpu: 8
+  sumMem: 8
+  filters: []
+  sameSize: true
+  onDemandPct: 50
+  minNodes: 1
+  maxNodes: 2
+questions:
+- type: secret
+  dataType: password
+  name: zeppelinpass
+  required: true
+  group: Zeppelin
+  label: 'Zeppelin server auth creds'
+  targets:
+    - name: deploy_application.deployment.values.banzaicloud.secret.zeppelin.name
+    - name: install_zeppelin_auth_secrets.clusterSecret.name
+    - name: deploy_application.deployment.values.zeppelin-spark.zeppelin.userCredentialSecretName
+- type: pipeline
+  dataType: boolean
+  label: "Monitoring"
+  required: true
+  group: Monitoring
+  key: monitoring
+  default: true
+  targets:
+    - deploy_application.deployment.values.zeppelin-spark.spark.monitoring.enabled
+- type: pipeline
+  dataType: string
+  controlType: code
+  config:
+    mode: properties
+  label: 'Metrics properties'
+  required: false
+  default: |
+    # Enable Prometheus for all instances by class name
+    *.sink.prometheus.class=com.banzaicloud.spark.metrics.sink.PrometheusSink
+    # Prometheus pushgateway address
+    *.sink.prometheus.pushgateway-address=prometheus-pushgateway.pipeline-system:9091
+    *.sink.prometheus.pushgateway-enable-timestamp=true
+    *.sink.prometheus.enable-dropwizard-collector=false
+    *.sink.prometheus.enable-jmx-collector=true
+    *.sink.prometheus.jmx-collector-config=/opt/spark/conf/monitoring/jmxCollector.yaml
+    *.sink.jmx.class=org.apache.spark.metrics.sink.JmxSink
+    # Enable JVM metrics source for all instances by class name
+    *.source.jvm.class=org.apache.spark.metrics.source.JvmSource
+  group: Monitoring
+  showIf:
+    properties:
+      monitoring:
+        const: true
+  targets:
+    - deploy_application.deployment.values.zeppelin-spark.spark.monitoring.metricsProperties
+- type: pipeline
+  dataType: enum
+  key: spark_version_enum
+  label: 'Spark Version'
+  description: ''
+  default: '2.3.2'
+  required: true
+  group: Spark
+  options:
+  - label: '2.3.2'
+    value: v0.9.0-k8s-1.0.74
+  - label: '2.4.0'
+    value: v0.9.0-k8s-1.0.76
+  targets:
+  - deploy_application.deployment.values.zeppelin-spark.zeppelin.image.tag
+  - deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkSubmitOptions.sparkImage.tag
+- type: pipeline
+  dataType: string
+  controlType: code
+  config:
+    mode: yaml
+  label: 'JMX collector'
+  required: false
+  default: |
+    lowercaseOutputName: false
+    lowercaseOutputLabelNames: false
+    whitelistObjectNames: ["*:*"]
+  group: Monitoring
+  showIf:
+    properties:
+      monitoring:
+        const: true
+  targets:
+    - deploy_application.deployment.values.zeppelin-spark.spark.monitoring.jmxCollector
+- type: pipeline
+  dataType: boolean
+  default: true
+  label: 'History Server'
+  required: true
+  key: historyServer
+  group: History Server
+  targets:
+    - deploy_application.deployment.values.historyServer.enabled
+- type: secret
+  dataType: htpasswd
+  name: historyserverpass
+  group: History Server
+  label: 'History Server Auth Creds'
+  required: true
+  showIf:
+    properties:
+      historyServer:
+        const: true
+  targets:
+    - name: deploy_application.deployment.values.banzaicloud.secret.historyServer.name
+    - name: install_history_server_auth_secrets.clusterSecret.name
+    - name: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.ingress.annotations["traefik.ingress.kubernetes.io/auth-secret"]
+- type: bucket
+  name: eventBucket
+  label: 'Bucket Name'
+  description: 'This bucket will be used to store spark logs.'
+  required: true
+  group: History Server
+  showIf:
+    properties:
+      historyServer:
+        const: true
+  targets:
+    - name: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.logDirectory
+    - cloud: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.cloudProvider
+    - secret.accessName: install_history_server_bucket_secrets.clusterSecret.name
+    - secret.accessName: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.secretName
+    - cloud: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.cloudProvider
+    - name: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.logDirectory
+    - secret.accessName: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.secretName
+    - aks.storageAccount: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.azureStorageAccountName

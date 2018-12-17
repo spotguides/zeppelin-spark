@@ -1,0 +1,6 @@
+dependencies:
+- name: zeppelin-spark
+  repository: http://kubernetes-charts.banzaicloud.com/branch/master
+  version: 0.0.21
+digest: sha256:d0492fcf1a6735e6964f7fc66a1a5d252c7e86a452168804cc274f304dad0ed8
+generated: 2018-12-05T16:43:00.45966694+01:00

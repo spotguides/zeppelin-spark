@@ -1,0 +1,41 @@
+# available when running the deployment in Pipeline CI
+banzaicloud:
+ tags: []
+ organization:
+   name:
+ cluster:
+   id:
+   name:
+   cloud:
+   distribution:
+   location:
+ secret:
+   zeppelin:
+    name:
+   historyServer:
+    name:
+
+zeppelin-spark:
+  zeppelin:
+    image:
+      tag: v0.9.0-k8s-1.0.74
+    resources:
+      limits:
+        cpu: 1
+        memory: 2048
+      requests:
+        cpu: 500m
+        memory: 1024
+    sparkSubmitOptions:
+      sparkImage:
+        name: banzaicloud/zeppelin-spark
+        tag: v0.9.0-k8s-1.0.74
+      sparkDriverCores: 500m
+      sparkDriverLimitCores: 1
+      sparkExecutorCores: 1
+      sparkDriverMemory: 1G
+      sparkExecutorMemory: 1G
+    interpreterConnectTimeout: "1200000"
+  spark-hs:
+    image:
+      tag: v2.3.2.146

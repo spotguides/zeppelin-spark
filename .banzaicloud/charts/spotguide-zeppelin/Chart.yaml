@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Spotguide chart for zeppelin
+name: spotguide-zeppelin
+version: 1.0.0

@@ -1,0 +1,67 @@
+Congratulations, you have deployed Zeppelin Spotguide to Kubernetes! Your release is named {{ .Release.Name }}.
+
+### Zeppelin
+
+To access the zeppelin ui:
+
+{{ $hosts := index .Values "zeppelin-spark" "zeppelin" "ingress" "hosts" }}
+{{ range $hosts }}
+- [{{ . }}](https://{{ . }})
+{{- end }}
+
+- [User secret]({{ $.Values.banzaicloud.organization.name }}/secret?name={{ .Values.banzaicloud.secret.zeppelin.name }})
+
+{{- if .Values.historyServer.enabled }}
+Spark logs are stored in the provided bucket for *Spark History Server* after your Spark context is closed. You can close the session by restarting 'spark' interpreter group on *Zeppelin* interpreter settings page here:
+{{- end }}
+
+{{ $hosts := index .Values "zeppelin-spark" "zeppelin" "ingress" "hosts" }}
+{{ range $hosts }}
+- [{{ . }}/#/interpreter](https://{{ . }}/#/interpreter)
+{{- end }}
+
+{{- if .Values.historyServer.enabled }}
+In case you already opened *Spark History Server*, you need to refresh browser page to reload completed application logs.
+
+### Spark History Server
+
+To access logs created by your spark job, we are using spark history server which can be accessed from here:
+
+{{ $hosts := index .Values "zeppelin-spark" "spark" "spark-hs" "ingress" "hosts" }}
+{{ range $hosts }}
+- [{{ . }}](https://{{ . }})
+{{- end }}
+
+Enter spark in search field.
+
+- [User secret]({{ $.Values.banzaicloud.organization.name }}/secret?name={{ .Values.banzaicloud.secret.historyServer.name }})
+{{- end}}
+
+### Monitoring
+
+The monitoring dashboard can be accessed on the following host:
+
+- [Grafana]({{ .Values.banzaicloud.organization.name }}/deployment?cluster={{ .Values.banzaicloud.cluster.name }}&releaseName=monitor)
+- [User secret]({{ $.Values.banzaicloud.organization.name }}/secret?name=cluster-{{ .Values.banzaicloud.cluster.id }}-grafana)
+
+{{- if .Values.banzaicloud.organization.name }}
+
+### CI/CD Pipeline
+
+Every time you make changes to the source code and update the `master` branch, the CI/CD pipeline will be triggered to reconfigure your spark cluster.
+
+[Go to CI/CD]({{ $.Values.banzaicloud.organization.name }}/cicd/{{ include "repo-name" . }})
+
+{{- end }}
+
+{{- if .Values.banzaicloud.organization.name }}
+
+### Secrets
+
+The following secrets were created as part of the spotguide:
+
+[Go to Secrets]({{ $.Values.banzaicloud.organization.name }}/secret?filter={{ include "repo-tag" . }})
+
+{{- end }}
+
+You can find more info about spotguide [here](https://github.com/banzaicloud/spotguide-zeppelin/blob/master/README.md).
