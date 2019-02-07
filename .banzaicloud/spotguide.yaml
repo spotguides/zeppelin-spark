@@ -17,9 +17,7 @@ questions:
   group: Zeppelin
   label: 'Zeppelin server auth creds'
   targets:
-    - name: deploy_application.deployment.values.banzaicloud.secret.zeppelin.name
-    - name: install_zeppelin_auth_secrets.clusterSecret.name
-    - name: deploy_application.deployment.values.zeppelin-spark.zeppelin.userCredentialSecretName
+    - name: install_zeppelin_auth_secrets.clusterSecret.sourceSecretName
 - type: pipeline
   dataType: boolean
   label: "Monitoring"
@@ -109,9 +107,7 @@ questions:
       historyServer:
         const: true
   targets:
-    - name: deploy_application.deployment.values.banzaicloud.secret.historyServer.name
-    - name: install_history_server_auth_secrets.clusterSecret.name
-    - name: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.ingress.annotations["traefik.ingress.kubernetes.io/auth-secret"]
+    - name: install_history_server_auth_secrets.clusterSecret.sourceSecretName
 - type: bucket
   name: eventBucket
   label: 'Bucket Name'
@@ -125,9 +121,7 @@ questions:
   targets:
     - name: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.logDirectory
     - cloud: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.cloudProvider
-    - secret.accessName: install_history_server_bucket_secrets.clusterSecret.name
-    - secret.accessName: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.secretName
+    - secret.accessName: install_history_server_bucket_secrets.clusterSecret.sourceSecretName
     - cloud: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.cloudProvider
     - name: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.logDirectory
-    - secret.accessName: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.secretName
     - aks.storageAccount: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.azureStorageAccountName
