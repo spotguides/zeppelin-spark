@@ -1,29 +1,32 @@
 pipeline:
 
   install_history_server_bucket_secrets:
-    image: banzaicloud/ci-pipeline-client:0.8
+    image: banzaicloud/ci-pipeline-client:0.10
     action: InstallSecret
     clusterSecret:
-      name:
+      # sourceSecretName:
+      name: '{{ .CICD_REPO_NAME }}-hs-bucket'
       namespace: default
       merge: true
-      spec: []
       convertToPreferredFormat: true
+      spec: []
 
   install_history_server_auth_secrets:
-    image: banzaicloud/ci-pipeline-client:0.8
+    image: banzaicloud/ci-pipeline-client:0.10
     action: InstallSecret
     clusterSecret:
-      name:
+      # sourceSecretName:
+      name: '{{ .CICD_REPO_NAME }}-hs-auth'
       namespace: default
       merge: true
       spec: []
 
   install_zeppelin_auth_secrets:
-    image: banzaicloud/ci-pipeline-client:0.8
+    image: banzaicloud/ci-pipeline-client:0.10
     action: InstallSecret
     clusterSecret:
-      name:
+      # sourceSecretName:
+      name: '{{ .CICD_REPO_NAME }}-zeppelin-auth'
       namespace: default
       merge: true
       spec: []
@@ -35,39 +38,47 @@ pipeline:
       - helm package ./.banzaicloud/charts/spotguide-zeppelin
 
   deploy_application:
-    image: banzaicloud/ci-pipeline-client:0.8
+    image: banzaicloud/ci-pipeline-client:0.10
     action: EnsureDeployment
     deployment:
       name: './spotguide-zeppelin-1.0.0.tgz'
       releaseName: '{{ .CICD_REPO_NAME }}'
       values:
+        banzaicloud:
+          secret:
+            historyServer: '{{ .CICD_REPO_NAME }}-hs-auth'
+            zeppelin: '{{ .CICD_REPO_NAME }}-zeppelin-auth'
         historyServer:
           enabled:
         zeppelin-spark:
           zeppelin:
-            userCredentialSecretName:
+            userCredentialSecretName: '{{ .CICD_REPO_NAME }}-zeppelin-auth'
+            sparkEventLogStorage:
+              secretName: '{{ .CICD_REPO_NAME }}-hs-bucket'
             ingress:
               enabled: true
               baseUrl:
               annotations:
                 kubernetes.io/ingress.class: traefik
                 traefik.frontend.rule.type: PathPrefixStrip
-                ingress.kubernetes.io/ssl-redirect: "true"
+                ingress.kubernetes.io/ssl-redirect: 'true'
               hosts:
-                - "zeppelin-{{.CICD_REPO_NAME}}.{{.CLUSTER_NAME}}.{{.ORG_NAME}}.{{.DOMAIN_NAME}}"
+                - 'zeppelin-{{.CICD_REPO_NAME}}.{{.CLUSTER_NAME}}.{{.ORG_NAME}}.{{.DOMAIN_NAME}}'
           spark:
             monitoring:
               enabled:
               jmxCollector:
               metricsProperties:
             spark-hs:
+              sparkEventLogStorage:
+                secretName: '{{ .CICD_REPO_NAME }}-hs-bucket'
               ingress:
                 enabled: true
                 annotations:
                   kubernetes.io/ingress.class: traefik
-                  traefik.ingress.kubernetes.io/auth-secret:
+                  traefik.ingress.kubernetes.io/auth-secret: '{{ .CICD_REPO_NAME }}-hs-auth'
                   traefik.frontend.rule.type: PathPrefixStrip
                   traefik.ingress.kubernetes.io/auth-type: basic
-                  ingress.kubernetes.io/ssl-redirect: "true"
+                  ingress.kubernetes.io/ssl-redirect: 'true'
                 hosts:
-                  - "shs-{{.CICD_REPO_NAME}}.{{.CLUSTER_NAME}}.{{.ORG_NAME}}.{{.DOMAIN_NAME}}"
+                  - 'shs-{{.CICD_REPO_NAME}}.{{.CLUSTER_NAME}}.{{.ORG_NAME}}.{{.DOMAIN_NAME}}'
