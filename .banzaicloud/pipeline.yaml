@@ -19,7 +19,9 @@ pipeline:
       name: '{{ .CICD_REPO_NAME }}-hs-auth'
       namespace: default
       merge: true
-      spec: []
+      spec: 
+        - name: htpasswd
+          source: htpasswd
 
   install_zeppelin_auth_secrets:
     image: banzaicloud/ci-pipeline-client:0.10
@@ -46,8 +48,8 @@ pipeline:
       values:
         banzaicloud:
           secret:
-            historyServer: '{{ .CICD_REPO_NAME }}-hs-auth'
-            zeppelin: '{{ .CICD_REPO_NAME }}-zeppelin-auth'
+            historyServer:
+            zeppelin:
         historyServer:
           enabled:
         zeppelin-spark:
