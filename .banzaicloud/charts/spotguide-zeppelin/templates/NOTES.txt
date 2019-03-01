@@ -9,10 +9,12 @@ To access the zeppelin ui:
 - [{{ . }}](https://{{ . }})
 {{- end }}
 
-- [User secret]({{ $.Values.banzaicloud.organization.name }}/secret?name={{ .Values.banzaicloud.secret.zeppelin.name }})
+- [User secret]({{ $.Values.banzaicloud.organization.name }}/secret?name={{ .Values.banzaicloud.secret.zeppelin }})
 
 {{- if .Values.historyServer.enabled }}
+
 Spark logs are stored in the provided bucket for *Spark History Server* after your Spark context is closed. You can close the session by restarting 'spark' interpreter group on *Zeppelin* interpreter settings page here:
+
 {{- end }}
 
 {{ $hosts := index .Values "zeppelin-spark" "zeppelin" "ingress" "hosts" }}
@@ -21,6 +23,7 @@ Spark logs are stored in the provided bucket for *Spark History Server* after yo
 {{- end }}
 
 {{- if .Values.historyServer.enabled }}
+
 In case you already opened *Spark History Server*, you need to refresh browser page to reload completed application logs.
 
 ### Spark History Server
@@ -32,16 +35,14 @@ To access logs created by your spark job, we are using spark history server whic
 - [{{ . }}](https://{{ . }})
 {{- end }}
 
-Enter spark in search field.
-
-- [User secret]({{ $.Values.banzaicloud.organization.name }}/secret?name={{ .Values.banzaicloud.secret.historyServer.name }})
+- [User secret]({{ $.Values.banzaicloud.organization.name }}/secret?name={{ .Values.banzaicloud.secret.historyServer }})
 {{- end}}
 
 ### Monitoring
 
 The monitoring dashboard can be accessed on the following host:
 
-- [Grafana]({{ .Values.banzaicloud.organization.name }}/deployment?cluster={{ .Values.banzaicloud.cluster.name }}&releaseName=monitor)
+- [Grafana]({{ .Values.banzaicloud.organization.name }}/deployment?cluster={{ .Values.banzaicloud.cluster.name }}&releaseName=monitor&name=monitor)
 - [User secret]({{ $.Values.banzaicloud.organization.name }}/secret?name=cluster-{{ .Values.banzaicloud.cluster.id }}-grafana)
 
 {{- if .Values.banzaicloud.organization.name }}
