@@ -19,7 +19,7 @@ pipeline:
       name: '{{ .CICD_REPO_NAME }}-hs-auth'
       namespace: default
       merge: true
-      spec: 
+      spec:
         - name: htpasswd
           source: htpasswd
 
@@ -65,7 +65,7 @@ pipeline:
                 traefik.frontend.rule.type: PathPrefixStrip
                 ingress.kubernetes.io/ssl-redirect: 'true'
               hosts:
-                - 'zeppelin-{{.CICD_REPO_NAME}}.{{.CLUSTER_NAME}}.{{.ORG_NAME}}.{{.DOMAIN_NAME}}'
+                - 'zeppelin-{{ printf "%s-%s" .CICD_REPO_NAME .CLUSTER_NAME | sha1sum | trunc 10}}.{{.ORG_NAME}}.{{.DOMAIN_NAME}}'
           spark:
             monitoring:
               enabled:
@@ -83,4 +83,4 @@ pipeline:
                   traefik.ingress.kubernetes.io/auth-type: basic
                   ingress.kubernetes.io/ssl-redirect: 'true'
                 hosts:
-                  - 'shs-{{.CICD_REPO_NAME}}.{{.CLUSTER_NAME}}.{{.ORG_NAME}}.{{.DOMAIN_NAME}}'
+                  - 'shs-{{ printf "%s-%s" .CICD_REPO_NAME .CLUSTER_NAME | sha1sum | trunc 10}}.{{.ORG_NAME}}.{{.DOMAIN_NAME}}'
