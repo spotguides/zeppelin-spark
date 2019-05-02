@@ -1,4 +1,4 @@
 dependencies:
   - name: zeppelin-spark
-    repository: http://kubernetes-charts.banzaicloud.com
+    repository: https://kubernetes-charts.banzaicloud.com
     version: 0.0.23

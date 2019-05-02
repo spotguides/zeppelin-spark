@@ -37,7 +37,8 @@ pipeline:
     image: lachlanevenson/k8s-helm:latest
     commands:
       - helm init -c
-      - helm package ./.banzaicloud/charts/spotguide-zeppelin
+      - helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
+      - helm package -u ./.banzaicloud/charts/spotguide-zeppelin
 
   deploy_application:
     image: banzaicloud/ci-pipeline-client:0.10
