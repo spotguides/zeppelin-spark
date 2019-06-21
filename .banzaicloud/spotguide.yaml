@@ -66,7 +66,7 @@ questions:
   - label: '2.3.2'
     value: v0.9.0-k8s-1.0.74
   - label: '2.4.0'
-    value: v0.9.0-k8s-1.0.76
+    value: v0.9.0-k8s-1.0.77
   targets:
   - deploy_application.deployment.values.zeppelin-spark.zeppelin.image.tag
   - deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkSubmitOptions.sparkImage.tag
