@@ -59,17 +59,14 @@ questions:
   key: spark_version_enum
   label: 'Spark Version'
   description: ''
-  default: '2.3.2'
+  default: '2.4.3'
   required: true
   group: Spark
   options:
-  - label: '2.3.2'
-    value: v0.9.0-k8s-1.0.74
-  - label: '2.4.0'
-    value: v0.9.0-k8s-1.0.77
+  - '2.3.2'
+  - '2.4.3'
   targets:
-  - deploy_application.deployment.values.zeppelin-spark.zeppelin.image.tag
-  - deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkSubmitOptions.sparkImage.tag
+  - deploy_application.deployment.values.banzaicloud.spark.version
 - type: pipeline
   dataType: string
   controlType: code
