@@ -1,0 +1,6 @@
+dependencies:
+- name: spark
+  version: 0.0.19
+
+- name: zeppelin
+  version: 0.0.18
