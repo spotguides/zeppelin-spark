@@ -36,7 +36,7 @@ pipeline:
   package_application:
     image: lachlanevenson/k8s-helm:latest
     commands:
-      - helm init -c      
+      - helm init -c
       - helm package ./.banzaicloud/charts/spotguide-zeppelin
 
   deploy_application:
@@ -82,5 +82,7 @@ pipeline:
                   traefik.frontend.rule.type: PathPrefixStrip
                   traefik.ingress.kubernetes.io/auth-type: basic
                   ingress.kubernetes.io/ssl-redirect: 'true'
+            {{{{- if .platform.AutoDNSEnabled }}}}
                 hosts:
                   - 'shs-{{ printf "%s-%s" .CICD_REPO_NAME .CLUSTER_NAME | sha1sum | trunc 10}}.{{.ORG_NAME}}.{{.DOMAIN_NAME}}'
+            {{{{- end }}}}

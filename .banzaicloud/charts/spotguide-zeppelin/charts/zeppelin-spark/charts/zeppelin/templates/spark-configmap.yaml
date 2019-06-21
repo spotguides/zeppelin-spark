@@ -53,7 +53,7 @@ data:
 
     {{- else if eq $schema "oracle" }}
 
-    spark.eventLog.dir={{- printf "oci://%s" .Values.sparkEventLogStorage.logDirectory }}
+    {{- printf "oci://%s@%s" .Values.sparkEventLogStorage.logDirectory .Values.sparkEventLogStorage.oracleNamespace }}
     spark.hadoop.fs.oci.client.hostname={{ default (printf "https://objectstorage.%s.oraclecloud.com" .Values.sparkEventLogStorage.oracleRegion) .Values.sparkEventLogStorage.oracleHost }}
     spark.hadoop.fs.oci.client.auth.tenantId=$tenancy_ocid
     spark.hadoop.fs.oci.client.auth.userId=$user_ocid
