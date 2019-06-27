@@ -99,6 +99,11 @@ data:
               "value": "cluster",
               "type": "string"
             },
+            "spark.kubernetes.namespace": {
+              "name": "spark.kubernetes.namespace",
+              "value": "{{ .Values.sparkSubmitOptions.k8sNameSpace }}",
+              "type": "string"
+            },
             "spark.executor.instances": {
               "name": "spark.executor.instances",
               "value": "2",
@@ -121,7 +126,7 @@ data:
             },
             "master": {
               "name": "master",
-              "value": "k8s://https://kubernetes:443",
+              "value": "k8s://https://kubernetes.default.svc.cluster.local:443",
               "type": "string"
             },
             "zeppelin.pyspark.python": {

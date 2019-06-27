@@ -10,20 +10,83 @@ resources:
   minNodes: 1
   maxNodes: 2
 questions:
+- type: pipeline
+  dataType: string
+  label: 'Namespace'
+  required: true
+  targets:
+    - deploy_application.deployment.namespace
+    - install_zeppelin_auth_secrets.clusterSecret.namespace
+    - install_history_server_bucket_secrets.clusterSecret.namespace
+    - install_history_server_auth_secrets.clusterSecret.namespace
+    - deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkSubmitOptions.k8sNameSpace
 - type: secret
   dataType: password
   name: zeppelinpass
   required: true
-  group: Zeppelin
-  label: 'Zeppelin server auth creds'
+  label: 'Zeppelin server auth credentials'
   targets:
     - name: install_zeppelin_auth_secrets.clusterSecret.sourceSecretName
     - name: deploy_application.deployment.values.banzaicloud.secret.zeppelin
 - type: pipeline
-  dataType: boolean
-  label: "Monitoring"
+  dataType: enum
+  key: spark_version_enum
+  label: 'Spark Version'
+  description: ''
+  default: '2.4.3'
   required: true
-  group: Monitoring
+  options:
+  - '2.3.2'
+  - '2.4.3'
+  targets:
+  - deploy_application.deployment.values.banzaicloud.spark.version
+- type: pipeline
+  dataType: boolean
+  default: true
+  label: 'Spark History Server'
+  required: true
+  key: historyServer
+  targets:
+    - deploy_application.deployment.values.historyServer.enabled
+- type: secret
+  dataType: htpasswd
+  name: historyserverpass
+  label: 'History Server Auth Creds'
+  required: true
+  showIf:
+    properties:
+      historyServer:
+        const: true
+  targets:
+    - name: install_history_server_auth_secrets.clusterSecret.sourceSecretName
+    - name: deploy_application.deployment.values.banzaicloud.secret.historyServer
+- type: bucket
+  name: eventBucket
+  label: 'Spark Event Log Bucket Name'
+  description: 'This bucket will be used to store spark logs.'
+  required: true
+  showIf:
+    properties:
+      historyServer:
+        const: true
+  targets:
+    - name: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.logDirectory
+    - name: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.logDirectory
+    - cloud: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.cloudProvider
+    - cloud: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.cloudProvider
+    - location: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.aliOssRegion
+    - location: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.oracleRegion
+    - location: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.aliOssRegion
+    - location: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.oracleRegion
+    - secret.accessName: install_history_server_bucket_secrets.clusterSecret.sourceSecretName
+    - secret.accessName: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.pipelineSecretName
+    - aks.storageAccount: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.azureStorageAccountName
+    - oracle.namespace: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.oracleNamespace
+    - oracle.namespace: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.oracleNamespace
+- type: pipeline
+  dataType: boolean
+  label: "Spark Monitoring"
+  required: true
   key: monitoring
   default: true
   targets:
@@ -47,26 +110,12 @@ questions:
     *.sink.jmx.class=org.apache.spark.metrics.sink.JmxSink
     # Enable JVM metrics source for all instances by class name
     *.source.jvm.class=org.apache.spark.metrics.source.JvmSource
-  group: Monitoring
   showIf:
     properties:
       monitoring:
         const: true
   targets:
     - deploy_application.deployment.values.zeppelin-spark.spark.monitoring.metricsProperties
-- type: pipeline
-  dataType: enum
-  key: spark_version_enum
-  label: 'Spark Version'
-  description: ''
-  default: '2.4.3'
-  required: true
-  group: Spark
-  options:
-  - '2.3.2'
-  - '2.4.3'
-  targets:
-  - deploy_application.deployment.values.banzaicloud.spark.version
 - type: pipeline
   dataType: string
   controlType: code
@@ -78,56 +127,9 @@ questions:
     lowercaseOutputName: false
     lowercaseOutputLabelNames: false
     whitelistObjectNames: ["*:*"]
-  group: Monitoring
   showIf:
     properties:
       monitoring:
         const: true
   targets:
     - deploy_application.deployment.values.zeppelin-spark.spark.monitoring.jmxCollector
-- type: pipeline
-  dataType: boolean
-  default: true
-  label: 'History Server'
-  required: true
-  key: historyServer
-  group: History Server
-  targets:
-    - deploy_application.deployment.values.historyServer.enabled
-- type: secret
-  dataType: htpasswd
-  name: historyserverpass
-  group: History Server
-  label: 'History Server Auth Creds'
-  required: true
-  showIf:
-    properties:
-      historyServer:
-        const: true
-  targets:
-    - name: install_history_server_auth_secrets.clusterSecret.sourceSecretName
-    - name: deploy_application.deployment.values.banzaicloud.secret.historyServer
-- type: bucket
-  name: eventBucket
-  label: 'Bucket Name'
-  description: 'This bucket will be used to store spark logs.'
-  required: true
-  group: History Server
-  showIf:
-    properties:
-      historyServer:
-        const: true
-  targets:
-    - name: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.logDirectory
-    - name: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.logDirectory
-    - cloud: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.cloudProvider
-    - cloud: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.cloudProvider
-    - location: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.aliOssRegion
-    - location: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.oracleRegion
-    - location: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.aliOssRegion
-    - location: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.oracleRegion
-    - secret.accessName: install_history_server_bucket_secrets.clusterSecret.sourceSecretName
-    - secret.accessName: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.pipelineSecretName
-    - aks.storageAccount: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.azureStorageAccountName
-    - oracle.namespace: deploy_application.deployment.values.zeppelin-spark.zeppelin.sparkEventLogStorage.oracleNamespace
-    - oracle.namespace: deploy_application.deployment.values.zeppelin-spark.spark.spark-hs.sparkEventLogStorage.oracleNamespace

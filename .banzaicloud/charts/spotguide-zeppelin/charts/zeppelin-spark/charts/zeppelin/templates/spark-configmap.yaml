@@ -4,7 +4,7 @@ metadata:
   name: {{ template "fullname" . }}-spark-config
 data:
   spark-defaults.conf: |-
-    spark.kubernetes.namespace={{ .Values.sparkSubmitOptions.k8sNameSpace }}
+    spark.kubernetes.authenticate.driver.serviceAccountName=spark
     spark.driver.cores={{ .Values.sparkSubmitOptions.sparkDriverCores }}
     spark.kubernetes.driver.limit.cores={{ .Values.sparkSubmitOptions.sparkDriverLimitCores }}
     spark.executor.cores={{ .Values.sparkSubmitOptions.sparkExecutorCores }}
@@ -13,7 +13,6 @@ data:
     spark.kubernetes.container.image={{- printf "%s:%s" .Values.sparkSubmitOptions.sparkImage.name .Values.sparkSubmitOptions.sparkImage.tag }}
     spark.metrics.conf=/opt/spark/conf/monitoring/metrics.properties
     spark.local.dir={{ .Values.sparkSubmitOptions.sparkLocalDir }}
-    spark.kubernetes.authenticate.driver.serviceAccountName={{ .Values.sparkSubmitOptions.driverServiceAccountName }}
     spark.kubernetes.driver.secrets.spark-{{ .Release.Name }}=/opt/spark/conf/monitoring
     spark.kubernetes.executor.secrets.spark-{{ .Release.Name }}=/opt/spark/conf/monitoring
     spark.kubernetes.driver.label.app={{ template "fullname" . }}-driver
