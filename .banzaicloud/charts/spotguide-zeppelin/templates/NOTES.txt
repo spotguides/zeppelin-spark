@@ -4,22 +4,23 @@ Congratulations, you have deployed Zeppelin Spotguide to Kubernetes! Your releas
 
 {{ $hosts := index .Values "zeppelin-spark" "zeppelin" "ingress" "hosts" }}
 
-{{ if not (has "/" $hosts) }}
-Zeppelin Web UI:
-{{ range $hosts }}
-- [{{ . }}](https://{{ . }})
-{{- end }}
-{{ else }}
+{{ if (has "/zeppelin" $hosts) }}
 Get Zeppelin Web UI URL by running this command:
 
 {{- if  eq .Values.banzaicloud.cluster.cloud "amazon" }}
 ```
-echo https://$(kubectl get ing --namespace {{ .Release.Namespace }} -l app=zeppelin,release={{ .Release.Name }} -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}')
+echo https://$(kubectl get ing --namespace {{ .Release.Namespace }} -l app={{ .Release.Name }},release={{ .Release.Name }} -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}')/zeppelin
 ```
 {{- else}}
 ```
-echo https://$(kubectl get ing --namespace {{ .Release.Namespace }} -l app=zeppelin,release={{ .Release.Name }} -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
+echo https://$(kubectl get ing --namespace {{ .Release.Namespace }} -l app={{ .Release.Name }},release={{ .Release.Name }} -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')/zeppelin
 ```
+{{- end }}
+
+{{ else }}
+Zeppelin Web UI:
+{{ range $hosts }}
+- [{{ . }}](https://{{ . }})
 {{- end}}
 {{- end}}
 
@@ -29,13 +30,12 @@ echo https://$(kubectl get ing --namespace {{ .Release.Namespace }} -l app=zeppe
 
 Spark logs are stored in the provided bucket for *Spark History Server* after your Spark context is closed. You can close the session by restarting 'spark' interpreter group on *Zeppelin* interpreter settings page here:
 
-{{ $hosts := index .Values "zeppelin-spark" "zeppelin" "ingress" "hosts" }}
-{{ if not (has "/" $hosts) }}
+{{ if (has "/zeppelin" $hosts) }}
+https://Zeppelin_Web_UI_URL/interpreter
+{{- else }}
 {{ range $hosts }}
 - [{{ . }}/#/interpreter](https://{{ . }}/#/interpreter)
 {{- end }}
-{{- else }}
-https://Zeppelin_Web_UI_URL/interpreter
 {{- end }}
 
 In case you already opened *Spark History Server*, you need to refresh browser page to reload completed application logs.

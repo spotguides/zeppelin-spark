@@ -72,14 +72,22 @@ pipeline:
               secretName: '{{ .CICD_REPO_NAME }}-hs-bucket'
             ingress:
               enabled: true
+          {{{{- if .platform.AutoDNSEnabled }}}}
               baseUrl:
               annotations:
                 kubernetes.io/ingress.class: traefik
                 traefik.frontend.rule.type: PathPrefixStrip
                 ingress.kubernetes.io/ssl-redirect: 'true'
-          {{{{- if .platform.AutoDNSEnabled }}}}
               hosts:
                 - 'zeppelin-{{ printf "%s-%s" .CICD_REPO_NAME .CLUSTER_NAME | sha1sum | trunc 10}}.{{.ORG_NAME}}.{{.DOMAIN_NAME}}'
+          {{{{- else }}}}
+              baseUrl: /zeppelin
+              annotations:
+                kubernetes.io/ingress.class: traefik
+                traefik.frontend.rule.type: PathPrefix
+                ingress.kubernetes.io/ssl-redirect: 'true'
+              hosts:
+                - '/zeppelin'
           {{{{- end }}}}
           spark:
             monitoring:
