@@ -2,12 +2,27 @@ Congratulations, you have deployed Zeppelin Spotguide to Kubernetes! Your releas
 
 ### Zeppelin
 
-To access the zeppelin ui:
-
 {{ $hosts := index .Values "zeppelin-spark" "zeppelin" "ingress" "hosts" }}
+
+{{ if (has "/zeppelin" $hosts) }}
+Get Zeppelin Web UI URL by running this command:
+
+{{- if  eq .Values.banzaicloud.cluster.cloud "amazon" }}
+```
+echo https://$(kubectl get ing --namespace {{ .Release.Namespace }} -l app={{ .Release.Name }},release={{ .Release.Name }} -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}')/zeppelin
+```
+{{- else}}
+```
+echo https://$(kubectl get ing --namespace {{ .Release.Namespace }} -l app={{ .Release.Name }},release={{ .Release.Name }} -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')/zeppelin
+```
+{{- end }}
+
+{{ else }}
+Zeppelin Web UI:
 {{ range $hosts }}
 - [{{ . }}](https://{{ . }})
-{{- end }}
+{{- end}}
+{{- end}}
 
 - [User secret]({{ $.Values.banzaicloud.organization.name }}/secret?name={{ .Values.banzaicloud.secret.zeppelin }})
 
@@ -15,25 +30,40 @@ To access the zeppelin ui:
 
 Spark logs are stored in the provided bucket for *Spark History Server* after your Spark context is closed. You can close the session by restarting 'spark' interpreter group on *Zeppelin* interpreter settings page here:
 
-{{- end }}
-
-{{ $hosts := index .Values "zeppelin-spark" "zeppelin" "ingress" "hosts" }}
+{{ if (has "/zeppelin" $hosts) }}
+https://Zeppelin_Web_UI_URL/interpreter
+{{- else }}
 {{ range $hosts }}
 - [{{ . }}/#/interpreter](https://{{ . }}/#/interpreter)
 {{- end }}
-
-{{- if .Values.historyServer.enabled }}
+{{- end }}
 
 In case you already opened *Spark History Server*, you need to refresh browser page to reload completed application logs.
 
 ### Spark History Server
 
-To access logs created by your spark job, we are using spark history server which can be accessed from here:
+You can view your event logs of your spark job, in Spark History Server:
 
 {{ $hosts := index .Values "zeppelin-spark" "spark" "spark-hs" "ingress" "hosts" }}
+
+{{ if not (has "/" $hosts) }}
 {{ range $hosts }}
 - [{{ . }}](https://{{ . }})
 {{- end }}
+{{ else }}
+
+Get the application URL by running this command:
+
+{{- if  eq .Values.banzaicloud.cluster.cloud "amazon" }}
+```
+echo https://$(kubectl get ing --namespace {{ .Release.Namespace }} -l app=spark-hs,release={{ .Release.Name }} -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}')
+```
+{{- else}}
+```
+echo https://$(kubectl get ing --namespace {{ .Release.Namespace }} -l app=spark-hs,release={{ .Release.Name }} -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
+```
+{{- end}}
+{{- end}}
 
 - [User secret]({{ $.Values.banzaicloud.organization.name }}/secret?name={{ .Values.banzaicloud.secret.historyServer }})
 {{- end}}
