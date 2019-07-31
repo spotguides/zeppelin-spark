@@ -95,4 +95,4 @@ The following secrets were created as part of the spotguide:
 
 {{- end }}
 
-You can find more info about spotguide [here](https://github.com/banzaicloud/spotguide-zeppelin/blob/master/README.md).
+You can find more info about spotguide [here](https://github.com/spotguides/zeppelin-spark/blob/master/README.md).
