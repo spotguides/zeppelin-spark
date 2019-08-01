@@ -11,10 +11,10 @@ image:
 resources:
   limits:
     cpu: 2
-    memory: 2048
+    memory: 4096
   requests:
-    cpu: 500m
-    memory: 1024
+    cpu: 1
+    memory: 2048
 
 additionalOptions:
 
