@@ -17,6 +17,7 @@ data:
     spark.kubernetes.executor.secrets.spark-{{ .Release.Name }}=/opt/spark/conf/monitoring
     spark.kubernetes.driver.label.app={{ template "fullname" . }}-driver
     spark.kubernetes.executor.label.app={{ template "fullname" . }}-executor
+    spark.kubernetes.driver.job.backofflimit=1
 
     {{- if .Values.sparkEventLogStorage.logDirectory }}
 
