@@ -73,7 +73,7 @@ pipeline:
             ingress:
               enabled: true
           {{{{- if .platform.AutoDNSEnabled }}}}
-              baseUrl:
+              baseUrl: /
               annotations:
                 kubernetes.io/ingress.class: traefik
                 traefik.frontend.rule.type: PathPrefixStrip
