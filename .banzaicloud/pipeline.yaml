@@ -34,7 +34,7 @@ pipeline:
       spec: []
 
   package_application:
-    image: lachlanevenson/k8s-helm:latest
+    image: lachlanevenson/k8s-helm:v2.16.1
     commands:
       - helm init -c
       - helm package ./.banzaicloud/charts/spotguide-zeppelin
