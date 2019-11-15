@@ -1,7 +1,7 @@
 pipeline:
 
   install_history_server_bucket_secrets:
-    image: banzaicloud/ci-pipeline-client:0.11
+    image: banzaicloud/ci-pipeline-client:0.12
     action: InstallSecret
     clusterSecret:
       # sourceSecretName:
@@ -12,7 +12,7 @@ pipeline:
       spec: []
 
   install_history_server_auth_secrets:
-    image: banzaicloud/ci-pipeline-client:0.11
+    image: banzaicloud/ci-pipeline-client:0.12
     action: InstallSecret
     clusterSecret:
       # sourceSecretName:
@@ -24,7 +24,7 @@ pipeline:
           source: htpasswd
 
   install_zeppelin_auth_secrets:
-    image: banzaicloud/ci-pipeline-client:0.11
+    image: banzaicloud/ci-pipeline-client:0.12
     action: InstallSecret
     clusterSecret:
       # sourceSecretName:
@@ -40,7 +40,7 @@ pipeline:
       - helm package ./.banzaicloud/charts/spotguide-zeppelin
 
   deploy_application:
-    image: banzaicloud/ci-pipeline-client:0.11
+    image: banzaicloud/ci-pipeline-client:0.12
     action: EnsureDeployment
     deployment:
       name: './spotguide-zeppelin-1.0.0.tgz'
